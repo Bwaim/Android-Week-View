@@ -161,9 +161,9 @@ internal class WeekViewGestureHandler<T>(
         }
 
         val isHorizontalAndDisabled =
-            currentFlingDirection.isHorizontal && !config.horizontalFlingEnabled
+            currentScrollDirection.isHorizontal && !config.horizontalFlingEnabled
 
-        val isVerticalAndDisabled = currentFlingDirection.isVertical && !config.verticalFlingEnabled
+        val isVerticalAndDisabled = currentScrollDirection.isVertical && !config.verticalFlingEnabled
 
         if (isHorizontalAndDisabled || isVerticalAndDisabled) {
             return true
@@ -307,15 +307,19 @@ internal class WeekViewGestureHandler<T>(
             timeShift = (today().dayOfWeek - config.firstDayOfWeek) * totalDayWidth
             totalDayWidth *= config.numberOfVisibleDays
         }
-        val leftDays = (config.currentOrigin.x / totalDayWidth).toDouble()
+        val leftDays = ((config.currentOrigin.x - timeShift) / totalDayWidth).toDouble()
 
         val finalLeftDays = when {
-            // snap to nearest day
-            currentFlingDirection.isNotNone -> round(leftDays)
-            // snap to last day
-            currentScrollDirection.isLeft -> floor(leftDays)
-            // snap to next day
-            currentScrollDirection.isRight -> ceil(leftDays)
+            currentFlingDirection.isNotNone -> {
+                when {
+                    // snap to last day
+                    currentScrollDirection.isLeft -> floor(leftDays)
+                    // snap to next day
+                    currentScrollDirection.isRight -> ceil(leftDays)
+                    // snap to nearest day
+                    else -> round(leftDays)
+                }
+            }
             // snap to nearest day
             else -> round(leftDays)
         }
