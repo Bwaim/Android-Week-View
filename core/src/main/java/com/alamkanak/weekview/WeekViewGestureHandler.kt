@@ -302,7 +302,9 @@ internal class WeekViewGestureHandler<T>(
 
     private fun goToNearestOrigin() {
         var totalDayWidth = config.totalDayWidth
+        var timeShift = 0f
         if (config.numberOfVisibleDays >= 7 && config.showFirstDayOfWeekFirst) {
+            timeShift = (today().dayOfWeek - config.firstDayOfWeek) * totalDayWidth
             totalDayWidth *= config.numberOfVisibleDays
         }
         val leftDays = (config.currentOrigin.x / totalDayWidth).toDouble()
@@ -318,7 +320,7 @@ internal class WeekViewGestureHandler<T>(
             else -> round(leftDays)
         }
 
-        val nearestOrigin = (config.currentOrigin.x - finalLeftDays * totalDayWidth).toInt()
+        val nearestOrigin = (config.currentOrigin.x - finalLeftDays * totalDayWidth - timeShift).toInt()
 
         if (nearestOrigin != 0) {
             // Stop current animation
